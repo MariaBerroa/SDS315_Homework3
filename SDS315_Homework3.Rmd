@@ -8,7 +8,7 @@ output: html_document
 
 ##### UTEID: mpb2544
 
-##### GitHub: insert link here
+##### GitHub: https://github.com/MariaBerroa/SDS315_Homework3
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -244,4 +244,28 @@ confint(boot_annoyed, level = 0.95)
 ```
 
 ##### **Part C:**
-##### 
+##### We are trying to answer what the proportion of American TV watchers that would give a response of 4 or greater to being "confused" when watching the show Dancing with the Stars.To answer this question I first filtered my dataset to obtain my desired variables and then I did bootstraping to generalize the dataset. On average, the proportion of americans who would rate the "confused" question above a 4 would be about 7.7%. Moreover, based on the sample, we're 95% confident that the true population proportion of rating above a 4 would be between **3.9%** and **12%**. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
+
+show_filtered_c <- shows %>%
+  filter(Show == "Dancing with the Stars") %>%
+  mutate(rate_4_or_5 = Q2_Confusing >= 4)
+
+# First let's calculate the proportion of cars that were painted black
+
+prop(~rate_4_or_5, data= show_filtered_c)
+
+#Let's bootstrap to generalize our dataset
+boot_is_rate = do(10000)*prop(~rate_4_or_5, data=mosaic::resample(show_filtered_c))
+
+
+#Let's plot to understand the sampling distribution
+ggplot(boot_is_rate) +
+  geom_histogram(aes(x = prop_TRUE ))
+
+#Let's calculate the confidence interval
+confint(boot_is_rate, level = 0.95)
+```
+
+
