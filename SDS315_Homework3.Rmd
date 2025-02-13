@@ -1,0 +1,247 @@
+---
+title: "SDS315 - Homework 3"
+date: "2025-02-10"
+output: html_document
+---
+
+##### Name: Maria Berroa
+
+##### UTEID: mpb2544
+
+##### GitHub: insert link here
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, echo=FALSE, include=FALSE}
+#Import libraries and files
+library(ggplot2)
+library(tidyverse)
+library(kableExtra)
+library(mosaic)
+
+gas = read.csv("gasprices.csv")
+class = read.csv("sclass.csv")
+shows = read.csv("nbc_pilotsurvey.csv")
+```
+
+
+#### **Problem 1**
+
+##### **Theory A: Gas stations charge more if they lack direct competition in sight**
+
+##### A theory explaining variation in prices between gas stations says that when in lack of direct competition in sight, gas stations charge more. When assesing this theory, we obtain gas stations with **no competitors** have prices $0.023 cents higher than those that **do have competitors**. It is important to mention the following data comes from a sample of 101 gas stations; therefore we will have some kind of uncertainity when generalizing to a wider population. If we generalize our dataset, we can say with 95% confidence that gas stations with **no competitors** have higer gas prices than those that do, on average, with a difference in means of somewhere between $0.007 and $0.06. The confidence interval does not rule out a difference of zero; therefore we can confirm that our data does not support theory A and the average price different between the two types of gas stations is **not**statistically significant. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
+# First let's calculate the difference between price depending on competitors.
+mean(Price ~ Competitors, data=gas)
+diffmean(Price ~ Competitors, data=gas)
+
+#Let's bootstrap to generalize our dataset
+boot_price_competitor = do(10000)*diffmean(Price~Competitors, data=mosaic::resample(gas))
+
+#Let's plot to understand the sampling distribution
+ggplot(boot_price_competitor) +
+  geom_histogram(aes(x = diffmean))
+
+#Let's calculate the confidence interval
+confint(boot_price_competitor, level = 0.95)
+                   
+```
+
+##### **Theory B: The richer the area, the higher the gas prices**
+
+##### A theory explaining variation in prices between gas stations states that the richer the area, the higher the gas prices. When assesing this theory, we obtain that the correlation between gas price and income is **0.40**; thus it represents a moderate positive relationship between our two variables. It is important to mention the following data comes from a sample of 101 gas stations; therefore we will have some kind of uncertainity when generalizing to a wider population. If we generalize our dataset, we can say with 95% confidence that the correlation between gas prices and area income is somewhere between **0.20** and **0.57**. Stating that even in the lowest estimate, there is still a moderate positive relationship between income and gas prices, suggesting that higher-income areas tend to have higher gas prices.The confidence interval rules out a difference of zero; therefore we can confirm that our data supports theory B and the correlation between price and income is statistically significant. 
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE,results='hide'}
+
+# First let's calculate the correlation between income and price
+cor(Price ~ Income, data=gas)
+
+#Let's bootstrap to generalize our dataset
+boot_price_income = do(10000)*cor(Price~Income, data=mosaic::resample(gas))
+
+#Let's plot to understand the sampling distribution
+ggplot(boot_price_income) +
+  geom_histogram(aes(x = cor))
+
+#Let's calculate the confidence interval
+confint(boot_price_income, level = 0.95)
+```
+
+##### **Theory C: Gas stations at stoplights charge more**
+
+##### A theory explaining variation in prices between gas stations states that gas stations at stoplights charge more.When assesing this theory, we obtain gas stations with **no stoplights in front of them** have prices $0.003 cents higher than those that **do have stoplights in front of them**. It is important to mention the following data comes from a sample of 101 gas stations; therefore we will have some kind of uncertainity when generalizing to a wider population. If we generalize our dataset, we can say with 95% confidence that gas stations with **no stoplights* have higer gas prices than those that do, on average, with a difference in means of somewhere between $0.03 and $0.04 The confidence interval does not rule out a difference of zero; therefore we can confirm that our data does not support theory C and the average price difference between the two types of gas stations is NOT statistically significant
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE,results='hide'}
+
+# First let's calculate the difference between price depending on stoplights.
+mean(Price ~ Stoplight, data=gas)
+diffmean(Price ~ Stoplight, data=gas)
+
+#Let's bootstrap to generalize our dataset
+boot_price_stoplight = do(10000)*diffmean(Price~Stoplight, data=mosaic::resample(gas))
+
+#Let's plot to understand the sampling distribution
+ggplot(boot_price_stoplight) +
+  geom_histogram(aes(x = diffmean))
+
+#Let's calculate the confidence interval
+confint(boot_price_stoplight, level = 0.95)
+
+
+```
+
+
+##### **Theory D: Gas stations with direct highway access charge more**
+
+##### A theory explaining variation in prices between gas stations states that gas stations with direct highway access charge more.When assesing this theory, we obtain gas stations with **direct highway access** have prices $0.05 cents higher than those that **do not have direct highway access**. It is important to mention the following data comes from a sample of 101 gas stations; therefore we will have some kind of uncertainity when generalizing to a wider population. If we generalize our dataset, we can say with 95% confidence that gas stations with **direct highway access* have higer gas prices than those that don't, on average, with a difference in means of somewhere between $0.009 and $0.081. The confidence interval rules out a difference of zero; therefore we can confirm that our data supports theory D and the average price difference between the two types of gas stations is statistically significant. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
+# First let's calculate the difference between price depending on highways. 
+mean(Price ~ Highway, data=gas)
+diffmean(Price ~ Highway, data=gas)
+
+#Let's bootstrap to generalize our dataset
+boot_price_highway = do(10000)*diffmean(Price~Highway, data=mosaic::resample(gas))
+
+#Let's plot to understand the sampling distribution
+ggplot(boot_price_highway) +
+  geom_histogram(aes(x = diffmean))
+
+#Let's calculate the confidence interval
+confint(boot_price_highway, level = 0.95)
+
+```
+
+
+##### **Theory E: Shell charges more than all other non-Shell brands**
+
+##### A theory explaining variation in prices between gas stations states that Shell charges more than all other non-Shell brands.When assesing this theory, we obtain that **Shell gas stations** have prices $0.027 cents higher than**Non-Shell gas stations**. It is important to mention the following data comes from a sample of 101 gas stations; therefore we will have some kind of uncertainity when generalizing to a wider population. If we generalize our dataset, we can say with 95% confidence that **Shell gas stations** have higer gas prices than **Non-Shell stations**, on average, with a difference in means of somewhere between $0.065 and $0.010. The confidence interval does not rule out a difference of zero; therefore we can confirm that our data does not support theory E and the average price difference between Shell and Non-Shell gas stations is NOT statistically significant. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE,results='hide'}
+# First let's calculate the difference between price between Shell and Non-Shell gas stations. 
+mean(Price ~ (Brand == "Shell"), data=gas)
+diffmean(Price ~ (Brand =="Shell"), data=gas)
+
+#Let's bootstrap to generalize our dataset
+boot_price_brand = do(10000)*diffmean(Price~ (Brand == "Shell"), data=mosaic::resample(gas))
+
+#Let's plot to understand the sampling distribution
+ggplot(boot_price_brand) +
+  geom_histogram(aes(x = diffmean))
+
+#Let's calculate the confidence interval
+confint(boot_price_brand, level = 0.95)
+
+```
+
+#### **Problem 2**
+
+##### **Part A:**
+##### The average mileage of 2011 S-Class 63 AMGs that were hitting the used-car market was about **30,763 miles.** and we are 95% confident that this answer ranges between **26,911 miles** and **34,763 miles**. 
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE, results='hide'}
+
+class_filtered <- class %>%
+  filter(year == "2011", trim == "63 AMG", condition == "Used")
+
+# First let's calculate the average mileage of 2011 vehicles hitting the used-car market 
+mean(~mileage, data= class_filtered)
+
+#Let's bootstrap to generalize our dataset
+boot_mileage <- do(10000) * mean(~mileage, data = mosaic ::resample(class_filtered))
+
+#Let's plot to understand the sampling distribution
+ggplot(boot_mileage) +
+  geom_histogram(aes(x = mean))
+
+#Let's calculate the confidence interval
+confint(boot_mileage, level = 0.95)
+
+```
+
+
+##### **Part B:**
+##### According to our information, about **43%**  of 2014 S-Class 550s were painted black. Moreover, based on the sample, we're 95% confident that the true population proportion of black-painted cars is somwhere between **42%** and **45%**. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
+class_filtered_b <- class %>%
+  filter(year == "2014", trim == "550") %>%
+  mutate(isBlack = color == "Black")
+
+# First let's calculate the proportion of cars that were painted black
+
+prop(~isBlack, data= class_filtered_b)
+
+#Let's bootstrap to generalize our dataset
+boot_isBlack = do(10000)*prop(~isBlack, data=mosaic::resample(class_filtered_b))
+
+
+#Let's plot to understand the sampling distribution
+ggplot(boot_isBlack) +
+  geom_histogram(aes(x = prop_TRUE ))
+
+#Let's calculate the confidence interval
+confint(boot_isBlack, level = 0.95)
+
+```
+
+
+#### **Problem 3**
+
+##### **Part A:**
+##### We are trying to answer if there is evidence that either show Living with Ed or My Name is Earl produces a "happier" reaction from the show viewers. To answer this questions I first filtered my dataset to obtain my desired variables and then I did bootstraping to generalize the dataset.On average, Living with Ed has ratings about 0.15 higher than My Name is Earl. Moreover, based on the sample we are 95% confident Living with Ed has higher happiness rates than My Name is Earl, on average, with a difference in means somewhere between 0.10 and 0.40. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
+
+show_filtered_a <- shows %>%
+  filter(Show == "Living with Ed" | Show =="My Name is Earl")
+
+
+mean(Q1_Happy ~ Show, data=show_filtered_a)
+diffmean(Q1_Happy ~ Show, data=show_filtered_a)
+
+#Let's bootstrap to generalize our dataset
+boot_happy = do(10000)*diffmean(Q1_Happy ~ Show, data=mosaic::resample(show_filtered_a))
+
+#Let's plot to understand the sampling distribution
+ggplot(boot_happy) +
+  geom_histogram(aes(x = diffmean))
+
+#Let's calculate the confidence interval
+confint(boot_happy, level = 0.95)
+
+
+```
+
+
+##### **Part B:**
+##### We are trying to answer if there is evidence that either show The Biggest Loser or The Apprentice: Los Angeles produces a higher annoyed reaction from the viewers. To answer this question I first filtered my dataset to obtain my desired variables and then I did bootstraping to generalize the dataset.On average, The Apprentice: Los Angeles has "annoyed" ratings about 0.30 higher than The Biggest Loser. Moreover, based on the sample we are 95% confident The Apprentice: Los Angeles has higher "annoyed" rates than The Biggest Loser, on average, with a difference in means somewhere between 0.52 and 0.01. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
+
+show_filtered_b <- shows %>%
+  filter(Show == "The Biggest Loser" | Show =="The Apprentice: Los Angeles")
+
+
+mean(Q1_Annoyed ~ Show, data=show_filtered_b)
+diffmean(Q1_Annoyed ~ Show, data=show_filtered_b)
+
+#Let's bootstrap to generalize our dataset
+boot_annoyed = do(10000)*diffmean(Q1_Annoyed ~ Show, data=mosaic::resample(show_filtered_b))
+
+#Let's plot to understand the sampling distribution
+ggplot(boot_annoyed) +
+  geom_histogram(aes(x = diffmean))
+
+#Let's calculate the confidence interval
+confint(boot_annoyed, level = 0.95)
+
+```
+
+##### **Part C:**
+##### 
